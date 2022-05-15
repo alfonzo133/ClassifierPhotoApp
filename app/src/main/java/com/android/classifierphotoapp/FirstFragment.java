@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,7 +46,6 @@ import java.util.List;
 public class FirstFragment extends Fragment {
     private FragmentFirstBinding binding;
     private LabelViewModel model;
-    List<String> labelList = null;
     private static final String[] PERMISSIONS = new String[]{
             Manifest.permission.INTERNET
     };
@@ -67,10 +67,7 @@ public class FirstFragment extends Fragment {
         checkPermissions();
 
         // get labels
-        new Thread(this::getLabelList).start();
-//        List<String> list = new ArrayList<>();
-//        list.add("bedroom");
-//        list.add("livingroom");
+        getLabelList();
 
         binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -88,6 +85,8 @@ public class FirstFragment extends Fragment {
             NavHostFragment.findNavController(FirstFragment.this)
                     .navigate(R.id.action_FirstFragment_to_SecondFragment);
         });
+
+        binding.buttonRefresh.setOnClickListener(view1 -> getLabelList());
     }
 
     private void checkPermissions() {
@@ -102,6 +101,10 @@ public class FirstFragment extends Fragment {
     }
 
     private void getLabelList() {
+        new Thread(this::labelReq).start();
+    }
+
+    private void labelReq() {
         try {
             URL url = new URL("http://192.168.1.21:4200");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -118,7 +121,7 @@ public class FirstFragment extends Fragment {
             conn.disconnect();
 
             JSONObject json = new JSONObject(buf.toString());
-            labelList = new ArrayList<>();
+            List<String> labelList = new ArrayList<>();
             JSONArray arr = json.getJSONArray("labels");
             for(int i = 0; i < arr.length(); i++)
                 labelList.add(arr.getString(i));
@@ -126,6 +129,7 @@ public class FirstFragment extends Fragment {
             String msg = "got labels successfully";
             Log.w("network: ", msg);
             Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
+            getActivity().runOnUiThread(() -> populateSpinner(labelList));
 
         } catch (IOException | JSONException e) {
             String msg = "failed to reach host";
@@ -133,6 +137,17 @@ public class FirstFragment extends Fragment {
             Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
 
             e.printStackTrace();
+        }
+    }
+
+    private void populateSpinner(List<String> list) {
+        ArrayAdapter<String> aa = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, list);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinner.setAdapter(aa);
+
+        if(model.selectedLabel != null) {
+            int index = list.indexOf(model.selectedLabel);
+            binding.spinner.setSelection(index);
         }
     }
 
