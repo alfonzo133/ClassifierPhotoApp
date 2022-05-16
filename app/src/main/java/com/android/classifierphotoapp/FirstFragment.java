@@ -67,7 +67,11 @@ public class FirstFragment extends Fragment {
         checkPermissions();
 
         // get labels
-        getLabelList();
+        if(model.labelList != null) {
+            populateSpinner(model.labelList);
+        } else {
+            getLabelList();
+        }
 
         binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -81,10 +85,8 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        binding.buttonFirst.setOnClickListener(view1 -> {
-            NavHostFragment.findNavController(FirstFragment.this)
-                    .navigate(R.id.action_FirstFragment_to_SecondFragment);
-        });
+        binding.buttonFirst.setOnClickListener(view1 -> NavHostFragment.findNavController(FirstFragment.this)
+                .navigate(R.id.action_FirstFragment_to_SecondFragment));
 
         binding.buttonRefresh.setOnClickListener(view1 -> getLabelList());
     }
@@ -101,12 +103,15 @@ public class FirstFragment extends Fragment {
     }
 
     private void getLabelList() {
-        new Thread(this::labelReq).start();
+        new Thread(() -> {
+            if(!labelReq("http://192.168.1.21:4200"))
+                labelReq("https://raw.githubusercontent.com/alfonzo133/ClassifierPhotoApp/master/labels.json");
+        }).start();
     }
 
-    private void labelReq() {
+    private boolean labelReq(String host) { // returns true if successful, false otherwise
         try {
-            URL url = new URL("http://192.168.1.21:4200");
+            URL url = new URL(host);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
@@ -129,14 +134,16 @@ public class FirstFragment extends Fragment {
             String msg = "got labels successfully";
             Log.w("network: ", msg);
             Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
+            model.labelList = labelList;
             getActivity().runOnUiThread(() -> populateSpinner(labelList));
+            return true;
 
         } catch (IOException | JSONException e) {
             String msg = "failed to reach host";
             Log.e("", msg);
             Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
-
             e.printStackTrace();
+            return false;
         }
     }
 

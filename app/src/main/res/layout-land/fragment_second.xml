@@ -6,24 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".SecondFragment">
 
+
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
-        android:layout_width="412dp"
-        android:layout_height="603dp"
+        android:layout_width="592dp"
+        android:layout_height="413dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/image_capture_button"
         android:layout_width="116dp"
         android:layout_height="96dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="64dp"
         android:elevation="2dp"
         android:text="@string/take_photo"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -31,26 +31,27 @@
 
     <Button
         android:id="@+id/button_second"
-        android:layout_width="126dp"
-        android:layout_height="55dp"
+        android:layout_width="112dp"
+        android:layout_height="57dp"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="208dp"
         android:text="@string/previous"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="103dp"
-        android:layout_height="32dp"
+        android:layout_width="111dp"
+        android:layout_height="33dp"
         android:layout_marginBottom="8dp"
         android:gravity="center"
         android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/button_second"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.051"
+        app:layout_constraintHorizontal_bias="0.974"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
