@@ -1,9 +1,48 @@
 {
     "labels": [
-        "livingroom",
-        "bedroom",
-        "kitchen",
-        "corridor",
-        "entrance"
+        "a_0",
+        "a_1",
+        "a_2",
+        "b_-1",
+        "b_0",
+        "b_1",
+        "b_2",
+        "t_0",
+        "cevre",
+        "cevre_2",
+        "cevre_3",
+        "cevre_ofis",
+        "cevre_ofis_2",
+        "bilgisayar",
+        "bilgisayar_ofis"
+        "fbe",
+        "jeofizik",
+        "jeofizik_ofis",
+        "jeoloji",
+        "jeoloji_2",
+        "jeoloji_ofis",
+        "dekanlik",
+        "elektrik",
+        "elektrik_ofis",
+        "kimya",
+        "kimya_2",
+        "kimya_ofis",
+        "met",
+        "met_2",
+        "met_3",
+        "met_4",
+        "met_ofis",
+        "met_ofis_2",
+        "makine",
+        "makine_2",
+        "makine_ofis"
+        "elektronik",
+        "elektronik_ofis",
+        "endustri",
+        "endustri_ofis",
+        "insaat",
+        "insaat_ofis",
+        
+        
     ]
 }

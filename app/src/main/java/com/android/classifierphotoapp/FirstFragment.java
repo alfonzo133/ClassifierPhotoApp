@@ -3,7 +3,9 @@ package com.android.classifierphotoapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.NetworkOnMainThreadException;
+import android.provider.MediaStore;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,6 +67,7 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         model = new ViewModelProvider(requireActivity()).get(LabelViewModel.class);
         checkPermissions();
+        Log.w("dir: ", MediaStore.Images.Media.EXTERNAL_CONTENT_URI.getPath());
 
         // get labels
         if(model.labelList != null) {

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -120,15 +121,26 @@ public class SecondFragment extends Fragment {
     }
 
     private void takePicture() {
+        ContentValues fcv = new ContentValues();
+        fcv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + viewModel.selectedLabel);
+        fcv.put(MediaStore.Images.Media.IS_PENDING, true);
+        Uri folder = getContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, fcv);
+        if(folder == null) {
+            Log.e("FOLDER: ", "failed to create folder");
+            return;
+        }
+        else {
+            Log.w("FOLDER: ", "created folder: " + folder);
+        }
+
 
         String filename = viewModel.selectedLabel + "_" + (System.currentTimeMillis() / 1000);
 
         ContentValues cv = new ContentValues();
         cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
         cv.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
-        cv.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+        cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + viewModel.selectedLabel);
         ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(
-//                file
                 this.getActivity().getContentResolver(),
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 cv
