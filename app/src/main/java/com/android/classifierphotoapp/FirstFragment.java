@@ -67,10 +67,9 @@ public class FirstFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         model = new ViewModelProvider(requireActivity()).get(LabelViewModel.class);
         checkPermissions();
-        Log.w("dir: ", MediaStore.Images.Media.EXTERNAL_CONTENT_URI.getPath());
 
         // get labels
-        if(model.labelList != null) {
+        if(model.labelList != null && model.labelList.size() > 0) {
             populateSpinner(model.labelList);
         } else {
             getLabelList();
@@ -106,6 +105,7 @@ public class FirstFragment extends Fragment {
     }
 
     private void getLabelList() {
+        Log.w("network: ", "getting label list");
         new Thread(() -> {
             if(!labelReq("http://192.168.1.21:4200"))
                 labelReq("https://raw.githubusercontent.com/alfonzo133/ClassifierPhotoApp/master/labels.json");
@@ -141,7 +141,7 @@ public class FirstFragment extends Fragment {
             getActivity().runOnUiThread(() -> populateSpinner(labelList));
             return true;
 
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
             String msg = "failed to reach host";
             Log.e("", msg);
             Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
