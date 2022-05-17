@@ -3,47 +3,37 @@ package com.android.classifierphotoapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.NetworkOnMainThreadException;
-import android.provider.MediaStore;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PackageManagerCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.android.classifierphotoapp.databinding.FragmentFirstBinding;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
+
 
 public class FirstFragment extends Fragment {
     private FragmentFirstBinding binding;
@@ -105,12 +95,39 @@ public class FirstFragment extends Fragment {
     }
 
     private void getLabelList() {
-        Log.w("network: ", "getting label list");
-        new Thread(() -> {
-            if(!labelReq("http://192.168.1.21:4200"))
-                labelReq("https://raw.githubusercontent.com/alfonzo133/ClassifierPhotoApp/master/labels.json");
-        }).start();
+        Log.w("file", "getting label list");
+        readLabelsFromJson();
     }
+
+    private void readLabelsFromJson() {
+        try {
+            InputStream in = getContext().getAssets().open("labels.json");
+            byte[] buf = new byte[in.available()];
+            in.read(buf);
+            in.close();
+            String jsonString = new String(buf, StandardCharsets.UTF_8);
+            List<String> list = jsonToArray(jsonString);
+            populateSpinner(list);
+            String msg = "read labels successfully";
+            Log.w("network: ", msg);
+            showSnackbar(msg);
+        } catch (IOException | JSONException e) {
+            String msg = "failed to read labels from file";
+            Log.e("", msg);
+            showSnackbar(msg);
+            e.printStackTrace();
+        }
+    }
+
+    private List<String> jsonToArray(String jsonString) throws JSONException {
+        JSONObject json = new JSONObject(jsonString);
+        List<String> list = new ArrayList<>();
+        JSONArray arr = json.getJSONArray("labels");
+        for(int i = 0; i < arr.length(); i++)
+            list.add(arr.getString(i));
+        return list;
+    }
+
 
     private boolean labelReq(String host) { // returns true if successful, false otherwise
         try {
@@ -123,28 +140,21 @@ public class FirstFragment extends Fragment {
             while ((line = in.readLine()) != null) {
                 buf.append(line).append("\n");
             }
-
             // cleanup
             in.close();
             conn.disconnect();
 
-            JSONObject json = new JSONObject(buf.toString());
-            List<String> labelList = new ArrayList<>();
-            JSONArray arr = json.getJSONArray("labels");
-            for(int i = 0; i < arr.length(); i++)
-                labelList.add(arr.getString(i));
-
             String msg = "got labels successfully";
             Log.w("network: ", msg);
-            Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
-            model.labelList = labelList;
-            getActivity().runOnUiThread(() -> populateSpinner(labelList));
+            showSnackbar(msg);
+            model.labelList = jsonToArray(buf.toString());
+            getActivity().runOnUiThread(() -> populateSpinner(model.labelList));
             return true;
 
         } catch (Exception e) {
             String msg = "failed to reach host";
             Log.e("", msg);
-            Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_SHORT).show();
+            showSnackbar(msg);
             e.printStackTrace();
             return false;
         }
@@ -159,6 +169,10 @@ public class FirstFragment extends Fragment {
             int index = list.indexOf(model.selectedLabel);
             binding.spinner.setSelection(index);
         }
+    }
+
+    private void showSnackbar(String msg) {
+        Snackbar.make(getActivity().findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

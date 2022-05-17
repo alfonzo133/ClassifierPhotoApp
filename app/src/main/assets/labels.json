@@ -35,14 +35,12 @@
         "met_ofis_2",
         "makine",
         "makine_2",
-        "makine_ofis"
+        "makine_ofis",
         "elektronik",
         "elektronik_ofis",
         "endustri",
         "endustri_ofis",
         "insaat",
-        "insaat_ofis",
-        
-        
+        "insaat_ofis"
     ]
 }
